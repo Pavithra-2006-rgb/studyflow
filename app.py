@@ -11,11 +11,13 @@ app.secret_key = 'studyflow_mysql_secret_2024'
 # DATABASE CONFIG  — edit DB_CONFIG to match your MySQL setup
 # ═══════════════════════════════════════════════════════════════
 DB_CONFIG = {
-    'host':     'localhost',
-    'user':     'root',
-    'password': 'pavi@2006',   # ← CHANGE THIS
-    'database': 'studyflow',
-    'charset':  'utf8mb4',
+    'host': 'hopper.proxy.rlwy.net',
+    'user': 'root',
+    'password': 'oxrdJNmudTrECGScMbjyvOlAtOSySECL',
+    'database': 'studyflow',   # ✅ IMPORTANT CHANGE
+    'port': 47449,
+    'charset': 'utf8mb4',
+    'connection_timeout': 10
 }
 
 def get_db():
