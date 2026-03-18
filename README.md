@@ -24,16 +24,7 @@ python app.py
 # Visit http://localhost:5000
 ```
 
-## Deploy to Google App Engine
 
-```bash
-# Authenticate
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-
-# Deploy
-gcloud app deploy app.yaml
-```
 
 ## Project Structure
 ```
