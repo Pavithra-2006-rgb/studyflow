@@ -11,7 +11,7 @@ A beautiful, feature-rich academic planning system built with Python Flask.
 - ✅ Hour-by-hour daily timetable
 - ✅ Full month-by-month calendar view
 - ✅ Task completion tracking with live progress bars
-- ✅ Google App Engine ready
+  
 
 ## Local Setup
 
