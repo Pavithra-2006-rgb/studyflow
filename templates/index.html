@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyFlow 2.0 — Smart Study Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f0;--white:#ffffff;--surface:#fff;--surface2:#f0ede6;
+  --primary:#2563eb;--primary-l:#dbeafe;--primary-d:#1d4ed8;
+  --amber:#f59e0b;--amber-l:#fef3c7;
+  --green:#10b981;--green-l:#d1fae5;
+  --red:#ef4444;--red-l:#fee2e2;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --text:#111827;--text2:#374151;--muted:#6b7280;
+  --border:#e2ddd4;--border2:#ccc8be;
+  --shadow:0 2px 8px rgba(0,0,0,0.07),0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-lg:0 12px 40px rgba(0,0,0,0.1),0 2px 8px rgba(0,0,0,0.05);
+}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden;}
+
+.page-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 900px 700px at 5% 15%,rgba(37,99,235,0.07),transparent 70%),
+    radial-gradient(ellipse 700px 600px at 95% 85%,rgba(245,158,11,0.08),transparent 70%),
+    radial-gradient(ellipse 500px 400px at 60% 45%,rgba(16,185,129,0.05),transparent 70%);}
+.dot-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(37,99,235,0.1) 1px,transparent 1px);
+  background-size:30px 30px;opacity:0.6;}
+
+nav{position:sticky;top:0;z-index:100;height:62px;padding:0 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(246,245,240,0.92);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);}
+.logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--primary);
+  text-decoration:none;display:flex;align-items:center;gap:8px;}
+.logo-box{width:30px;height:30px;background:var(--primary);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.9rem;}
+.v-badge{background:var(--amber);color:#fff;font-size:0.58rem;font-weight:800;
+  padding:2px 6px;border-radius:20px;letter-spacing:1px;}
+.nav-r{display:flex;gap:28px;align-items:center;}
+.nav-r a{color:var(--muted);text-decoration:none;font-size:0.88rem;font-weight:700;transition:color .2s;}
+.nav-r a:hover{color:var(--primary);}
+.btn-blue{background:var(--primary);color:#fff;padding:9px 22px;border-radius:10px;
+  font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;
+  text-decoration:none;border:none;transition:all .2s;box-shadow:0 2px 10px rgba(37,99,235,0.3);}
+.btn-blue:hover{background:var(--primary-d);transform:translateY(-1px);box-shadow:0 5px 18px rgba(37,99,235,0.4);}
+
+/* Hero */
+.hero{position:relative;z-index:1;min-height:calc(100vh - 62px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:80px 40px 60px;}
+.hero-pill{display:inline-flex;align-items:center;gap:8px;
+  background:var(--primary-l);border:1.5px solid rgba(37,99,235,0.25);color:var(--primary);
+  padding:7px 18px;border-radius:100px;font-size:0.76rem;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;margin-bottom:26px;animation:up .5s ease both;}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;
+  box-shadow:0 0 0 3px rgba(16,185,129,0.2);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+h1.ht{font-family:'Nunito',sans-serif;font-weight:900;
+  font-size:clamp(2.8rem,7vw,5.8rem);line-height:1.04;letter-spacing:-2.5px;
+  color:var(--text);margin-bottom:18px;animation:up .5s .08s ease both;}
+.grad{background:linear-gradient(135deg,var(--primary) 0%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{max-width:540px;color:var(--muted);font-size:1.02rem;line-height:1.78;
+  margin-bottom:40px;font-weight:600;animation:up .5s .16s ease both;}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:up .5s .24s ease both;}
+.btn-big{background:var(--primary);color:#fff;border:none;
+  padding:14px 34px;border-radius:12px;font-family:'Nunito',sans-serif;
+  font-size:0.96rem;font-weight:800;cursor:pointer;transition:all .25s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:9px;
+  box-shadow:0 4px 22px rgba(37,99,235,0.35);}
+.btn-big:hover{background:var(--primary-d);transform:translateY(-2px);box-shadow:0 10px 34px rgba(37,99,235,0.45);}
+.btn-wh{background:#fff;color:var(--text);border:2px solid var(--border2);
+  padding:14px 34px;border-radius:12px;font-family:'Nunito',sans-serif;
+  font-size:0.96rem;font-weight:800;cursor:pointer;transition:all .25s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:9px;box-shadow:var(--shadow);}
+.btn-wh:hover{border-color:var(--primary);color:var(--primary);transform:translateY(-2px);}
+
+/* Calendar mockup */
+.cal-mock{margin-top:56px;animation:up .5s .32s ease both;}
+.cal-card{background:#fff;border:1px solid var(--border);border-radius:20px;
+  padding:18px;box-shadow:var(--shadow-lg);max-width:660px;margin:0 auto;}
+.cal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-month{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--text);}
+.cal-legend{display:flex;gap:12px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;color:var(--muted);}
+.leg-dot{width:8px;height:8px;border-radius:2px;}
+.cal-grid-mock{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.cdh{text-align:center;font-size:0.65rem;font-weight:800;color:var(--muted);
+  letter-spacing:0.5px;text-transform:uppercase;padding:4px 0;}
+.cd{border-radius:8px;padding:6px 5px;min-height:70px;font-size:0.68rem;}
+.cd-num{font-weight:900;font-size:0.82rem;margin-bottom:3px;display:block;}
+.cd-task{padding:2px 5px;border-radius:4px;margin-bottom:2px;font-size:0.6rem;font-weight:700;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.cd.study{background:rgba(37,99,235,0.04);border:1px solid rgba(37,99,235,0.15);}
+.cd.exam-d{background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.4);}
+.cd.off-d{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);}
+.cd.empty-d{background:transparent;border:1px solid transparent;}
+.t-blue{background:rgba(37,99,235,0.12);color:var(--primary);}
+.t-purple{background:rgba(124,58,237,0.12);color:var(--purple);}
+.t-green{background:rgba(16,185,129,0.12);color:#059669;}
+.t-exam{background:rgba(245,158,11,0.2);color:#92400e;}
+.t-off{background:rgba(239,68,68,0.12);color:#b91c1c;}
+
+.stats-row{display:flex;gap:48px;margin-top:48px;padding-top:36px;
+  border-top:1px solid var(--border);justify-content:center;animation:up .5s .4s ease both;}
+.sn{font-family:'Nunito',sans-serif;font-size:2.1rem;font-weight:900;color:var(--primary);}
+.sl{font-size:0.75rem;color:var(--muted);font-weight:700;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* Features */
+.features{position:relative;z-index:1;padding:90px 48px;max-width:1160px;margin:0 auto;}
+.ey{font-size:0.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--primary);font-weight:800;text-align:center;margin-bottom:10px;}
+.st{font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(1.8rem,4vw,2.7rem);
+  text-align:center;margin-bottom:14px;letter-spacing:-1px;color:var(--text);}
+.ss{text-align:center;color:var(--muted);font-size:0.95rem;margin-bottom:52px;
+  max-width:460px;margin-left:auto;margin-right:auto;font-weight:600;line-height:1.65;}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px;}
+.fc{background:#fff;border:1px solid var(--border);border-radius:16px;padding:26px;
+  transition:all .25s;box-shadow:var(--shadow);}
+.fc:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:rgba(37,99,235,0.4);}
+.fi{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:1.3rem;margin-bottom:14px;}
+.ft{font-weight:800;font-size:0.95rem;margin-bottom:7px;color:var(--text);}
+.fd{color:var(--muted);font-size:0.85rem;line-height:1.6;font-weight:500;}
+
+/* How */
+.how{position:relative;z-index:1;padding:90px 48px;background:#fff;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.hi{max-width:840px;margin:0 auto;}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:48px;}
+.sc{background:var(--bg);border:1.5px solid var(--border);border-radius:16px;
+  padding:26px;display:flex;gap:18px;align-items:flex-start;transition:all .2s;}
+.sc:hover{border-color:var(--primary);background:var(--primary-l);}
+.snb{width:42px;height:42px;border-radius:11px;background:var(--primary);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;
+  font-weight:900;font-size:1.05rem;flex-shrink:0;box-shadow:0 4px 14px rgba(37,99,235,0.3);}
+.sct{font-weight:800;font-size:0.95rem;margin-bottom:5px;color:var(--text);}
+.scd{color:var(--muted);font-size:0.83rem;line-height:1.6;font-weight:500;}
+
+/* CTA */
+.cta{position:relative;z-index:1;padding:90px 48px;text-align:center;}
+.cta-box{max-width:620px;margin:0 auto;
+  background:linear-gradient(135deg,var(--primary),var(--purple));
+  border-radius:26px;padding:58px 44px;color:#fff;
+  box-shadow:0 20px 60px rgba(37,99,235,0.28);}
+.cta-box h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.3rem;margin-bottom:12px;letter-spacing:-0.5px;}
+.cta-box p{opacity:0.88;font-size:0.97rem;margin-bottom:34px;font-weight:600;line-height:1.65;}
+.btn-wh2{background:#fff;color:var(--primary);border:none;
+  padding:15px 42px;border-radius:12px;font-family:'Nunito',sans-serif;
+  font-size:0.98rem;font-weight:800;cursor:pointer;transition:all .2s;
+  text-decoration:none;display:inline-flex;align-items:center;gap:9px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.18);}
+.btn-wh2:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.24);}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:26px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  color:var(--muted);font-size:0.82rem;font-weight:700;background:#fff;}
+
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:768px){
+  nav{padding:0 16px;}
+  .hero{padding:60px 16px 50px;}
+  .stats-row{gap:24px;flex-wrap:wrap;}
+  .features,.cta{padding:60px 16px;}
+  .how{padding:60px 16px;}
+  .sg{grid-template-columns:1fr;}
+  .cta-box{padding:36px 20px;}
+  nav .nav-r a:not(.btn-blue){display:none;}
+}
+</style>
+</head>
+<body>
+<div class="page-bg"></div>
+<div class="dot-grid"></div>
+
+<nav>
+  <a href="/" class="logo"><div class="logo-box">📘</div>StudyFlow <span class="v-badge">2.0</span></a>
+  <div class="nav-r">
+    <a href="#features">Features</a>
+    <a href="#how">How it Works</a>
+    <a href="/planner" class="btn-blue">Start Planning →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-pill"><div class="live-dot"></div> Smart Academic Planner</div>
+  <h1 class="ht">Plan Smarter,<br><span class="grad">Score Higher.</span></h1>
+  <p class="hero-sub">StudyFlow 2.0 builds a personalized hour-by-hour study timetable around your real life — college hours, sleep, meals, exams, and every commitment you have.</p>
+  <div class="cta-row">
+    <a href="/planner" class="btn-big">🚀 Create My Schedule</a>
+    <a href="#how" class="btn-wh">See How It Works</a>
+  </div>
+
+  <div class="cal-mock">
+    <div class="cal-card">
+      <div class="cal-top">
+        <div class="cal-month">November 2024</div>
+        <div class="cal-legend">
+          <div class="leg"><div class="leg-dot" style="background:var(--primary)"></div>Study</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--amber)"></div>Exam</div>
+          <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>Off</div>
+        </div>
+      </div>
+      <div class="cal-grid-mock">
+        <div class="cdh">Sun</div><div class="cdh">Mon</div><div class="cdh">Tue</div>
+        <div class="cdh">Wed</div><div class="cdh">Thu</div><div class="cdh">Fri</div><div class="cdh">Sat</div>
+        <div class="cd empty-d"></div>
+        <div class="cd empty-d"></div>
+        <div class="cd empty-d"></div>
+        <div class="cd empty-d"></div>
+        <div class="cd study"><span class="cd-num">1</span><span class="cd-task t-blue">Maths 2h</span><span class="cd-task t-purple">Physics 2h</span></div>
+        <div class="cd study"><span class="cd-num">2</span><span class="cd-task t-purple">Physics 2h</span><span class="cd-task t-green">Chem 2h</span></div>
+        <div class="cd off-d"><span class="cd-num">3</span><span class="cd-task t-off">✗ Off Day</span></div>
+        <div class="cd study"><span class="cd-num">4</span><span class="cd-task t-blue">Maths 2h</span><span class="cd-task t-green">Chem 2h</span></div>
+        <div class="cd study"><span class="cd-num">5</span><span class="cd-task t-purple">Physics 2h</span><span class="cd-task t-blue">Maths 2h</span></div>
+        <div class="cd study"><span class="cd-num">6</span><span class="cd-task t-green">Chem 2h</span><span class="cd-task t-blue">Maths 2h</span></div>
+        <div class="cd study"><span class="cd-num">7</span><span class="cd-task t-purple">Physics 2h</span><span class="cd-task t-green">Chem 2h</span></div>
+        <div class="cd study"><span class="cd-num">8</span><span class="cd-task t-blue">Maths 2h</span><span class="cd-task t-green">Chem 2h</span></div>
+        <div class="cd study"><span class="cd-num">9</span><span class="cd-task t-purple">Physics 2h</span><span class="cd-task t-blue">Maths 1.5h</span></div>
+        <div class="cd exam-d"><span class="cd-num" style="color:#92400e">10</span><span class="cd-task t-exam">📝 Mathematics</span></div>
+        <div class="cd study"><span class="cd-num">11</span><span class="cd-task t-purple">Physics 2h</span><span class="cd-task t-green">Chem 2h</span></div>
+        <div class="cd study"><span class="cd-num">12</span><span class="cd-task t-green">Chem 2h</span><span class="cd-task t-purple">Physics 2h</span></div>
+        <div class="cd study"><span class="cd-num">13</span><span class="cd-task t-purple">Physics 2h</span><span class="cd-task t-green">Chem 1.5h</span></div>
+        <div class="cd exam-d"><span class="cd-num" style="color:#92400e">14</span><span class="cd-task t-exam">📝 Physics</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div><div class="sn">9</div><div class="sl">Smart Features</div></div>
+    <div><div class="sn">∞</div><div class="sl">Study Plans</div></div>
+    <div><div class="sn">100%</div><div class="sl">Personalized</div></div>
+    <div><div class="sn">Free</div><div class="sl">No Signup</div></div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <p class="ey">Everything you need</p>
+  <h2 class="st">Built for Real Student Life</h2>
+  <p class="ss">Every feature designed around how students actually study — not how textbooks say they should.</p>
+  <div class="fg">
+    <div class="fc"><div class="fi" style="background:#dbeafe;">📅</div><h3 class="ft">Smart Date Calculation</h3><p class="fd">Set your start and last exam date. StudyFlow auto-calculates every available study day.</p></div>
+    <div class="fc"><div class="fi" style="background:#fef3c7;">📋</div><h3 class="ft">Exam Timetable Import</h3><p class="fd">Paste your college exam schedule in any format — dates and subjects detected automatically.</p></div>
+    <div class="fc"><div class="fi" style="background:#fee2e2;">🚫</div><h3 class="ft">Unavailable Date Marking</h3><p class="fd">Mark travel or personal days. Study hours redistributed so nothing is missed.</p></div>
+    <div class="fc"><div class="fi" style="background:#d1fae5;">📚</div><h3 class="ft">Syllabus Auto-Detection</h3><p class="fd">Paste syllabus text — units, chapters and topics extracted, study hours calculated per chapter.</p></div>
+    <div class="fc"><div class="fi" style="background:#ede9fe;">⚖️</div><h3 class="ft">Balanced Daily Mix</h3><p class="fd">All subjects every day — equal time slots so nothing falls behind schedule.</p></div>
+    <div class="fc"><div class="fi" style="background:#dbeafe;">⏰</div><h3 class="ft">Routine-Aware Planning</h3><p class="fd">Enter wake time, college hours, sleep hours. Exact free study time calculated for you.</p></div>
+    <div class="fc"><div class="fi" style="background:#fef3c7;">🕐</div><h3 class="ft">Hour-by-Hour Timetable</h3><p class="fd">Complete daily schedule with exact times for study, college, meals, breaks and sleep.</p></div>
+    <div class="fc"><div class="fi" style="background:#d1fae5;">🗓️</div><h3 class="ft">Full Calendar View</h3><p class="fd">Month-by-month calendar showing subject names AND hours on every single day.</p></div>
+    <div class="fc"><div class="fi" style="background:#ede9fe;">✅</div><h3 class="ft">Task Completion Tracking</h3><p class="fd">Click tasks to mark done. Live progress bars per subject update in real time.</p></div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="hi">
+    <p class="ey" style="text-align:center">Simple process</p>
+    <h2 class="st">From Zero to Schedule in 5 Minutes</h2>
+    <div class="sg">
+      <div class="sc"><div class="snb">1</div><div><h3 class="sct">Set Your Timeline</h3><p class="scd">Enter study start date, last exam date, and mark any days you can't study.</p></div></div>
+      <div class="sc"><div class="snb">2</div><div><h3 class="sct">Import Exam Timetable</h3><p class="scd">Paste your college exam schedule — dates and subjects read automatically.</p></div></div>
+      <div class="sc"><div class="snb">3</div><div><h3 class="sct">Add Subjects & Syllabus</h3><p class="scd">Add each subject, paste syllabus. Units and topics detected instantly.</p></div></div>
+      <div class="sc"><div class="snb">4</div><div><h3 class="sct">Enter Daily Routine</h3><p class="scd">Wake time, college hours, sleep — we calculate your exact free study time.</p></div></div>
+      <div class="sc" style="grid-column:1/-1;background:var(--primary-l);border-color:rgba(37,99,235,0.3);">
+        <div class="snb" style="background:var(--green);box-shadow:0 4px 14px rgba(16,185,129,0.3);">✓</div>
+        <div><h3 class="sct" style="color:var(--primary);font-size:1.05rem;">Get Your Complete Schedule</h3>
+        <p class="scd">Full calendar with every subject + exact hours shown on each day. If the day only needs 4h, it shows 4h. If it needs 7h, it shows 7h. Always right-sized, always balanced.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-box">
+    <h2>Ready to ace your exams? 🎯</h2>
+    <p>Create your personalized study schedule in under 5 minutes. No signup required, completely free.</p>
+    <a href="/planner" class="btn-wh2">Start Planning Now →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="logo" style="font-size:1.05rem;"><div class="logo-box" style="width:26px;height:26px;font-size:0.78rem;">📘</div>StudyFlow <span class="v-badge">2.0</span></div>
+  <div>Built for students, by students ✨</div>
+</footer>
+</body>
+</html>

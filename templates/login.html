@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login — StudyFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── Exact same CSS variables as planner.html / calendar.html ── */
+:root{
+  --bg:#f6f5f0;--white:#fff;--surface2:#f0ede6;
+  --primary:#2563eb;--primary-l:#dbeafe;--primary-d:#1d4ed8;
+  --amber:#f59e0b;--amber-l:#fef3c7;
+  --green:#10b981;--green-l:#d1fae5;
+  --red:#ef4444;--red-l:#fee2e2;
+  --text:#111827;--muted:#6b7280;
+  --border:#e2ddd4;--border2:#ccc8be;
+  --shadow:0 2px 8px rgba(0,0,0,0.07),0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Nunito',sans-serif;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+
+/* Same subtle background as other pages */
+.page-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 700px 500px at 0% 0%,rgba(37,99,235,0.06),transparent 70%),
+    radial-gradient(ellipse 600px 400px at 100% 100%,rgba(124,58,237,0.05),transparent 70%);}
+.dot-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(37,99,235,0.08) 1px,transparent 1px);
+  background-size:28px 28px;opacity:0.7;}
+
+/* ── Login card — matches .card in planner.html ── */
+.login-wrap{position:relative;z-index:1;width:100%;max-width:400px;}
+
+.login-card{
+  background:#fff;
+  border:1.5px solid var(--border);
+  border-radius:18px;
+  padding:36px 32px;
+  box-shadow:var(--shadow-lg);
+}
+
+/* ── Logo row — same as nav logo ── */
+.logo-row{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-bottom:24px;
+}
+.logo-box{
+  width:34px;height:34px;background:var(--primary);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1rem;
+  box-shadow:0 3px 10px rgba(37,99,235,0.3);
+}
+.logo-txt{
+  font-family:'Nunito',sans-serif;font-weight:900;font-size:1.3rem;color:var(--primary);
+}
+.v-badge{
+  background:var(--amber);color:#fff;font-size:0.56rem;
+  font-weight:800;padding:2px 6px;border-radius:20px;letter-spacing:1px;
+}
+
+/* ── Title ── */
+.card-title{
+  font-family:'Nunito',sans-serif;font-weight:900;
+  font-size:1.3rem;letter-spacing:-0.5px;
+  color:var(--text);text-align:center;margin-bottom:24px;
+}
+
+/* ── Tab toggle — matches image screenshot style ── */
+.tabs{
+  display:flex;background:var(--surface2);
+  border-radius:10px;padding:4px;gap:4px;margin-bottom:24px;
+}
+.tab{
+  flex:1;padding:9px 0;border-radius:7px;border:none;
+  background:transparent;font-family:'Nunito',sans-serif;
+  font-size:0.88rem;font-weight:800;color:var(--muted);
+  cursor:pointer;transition:all .2s;
+}
+.tab.active{
+  background:#fff;color:var(--primary);
+  box-shadow:0 1px 6px rgba(0,0,0,0.08);
+}
+
+/* ── Form sections ── */
+.form-sec{display:none;}
+.form-sec.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Field groups — same as .fg in planner.html ── */
+.fg{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.fg label{font-size:0.82rem;font-weight:800;color:var(--text);}
+.iw{position:relative;}
+.fg input{
+  width:100%;background:var(--surface2);
+  border:1.5px solid var(--border);border-radius:10px;
+  padding:11px 14px 11px 40px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:0.92rem;font-weight:600;
+  transition:all .2s;outline:none;
+}
+.fg input:focus{
+  border-color:var(--primary);background:#fff;
+  box-shadow:0 0 0 3px rgba(37,99,235,0.12);
+}
+.fg input::placeholder{color:var(--border2);}
+.ii{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  font-size:0.95rem;pointer-events:none;
+}
+.show-pw{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:0.78rem;font-family:'Nunito',sans-serif;font-weight:700;
+  transition:color .2s;
+}
+.show-pw:hover{color:var(--primary);}
+
+/* ── Message box ── */
+.msg{
+  border-radius:9px;padding:10px 13px;font-size:0.8rem;font-weight:700;
+  margin-bottom:14px;display:none;align-items:center;gap:7px;line-height:1.4;
+}
+.msg.err{background:var(--red-l);color:#b91c1c;border:1.5px solid rgba(239,68,68,0.2);}
+.msg.ok {background:var(--green-l);color:#065f46;border:1.5px solid rgba(16,185,129,0.2);}
+.msg.show{display:flex;}
+
+/* ── Submit button — same as .btn-pr in planner.html ── */
+.btn-submit{
+  width:100%;padding:13px;border-radius:10px;border:none;
+  background:var(--primary);color:#fff;
+  font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;
+  cursor:pointer;transition:all .2s;margin-top:2px;
+  box-shadow:0 3px 14px rgba(37,99,235,0.3);
+}
+.btn-submit:hover{
+  background:var(--primary-d);transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(37,99,235,0.4);
+}
+.btn-submit:disabled{opacity:0.45;cursor:not-allowed;transform:none;}
+
+/* ── Bottom note ── */
+.note{
+  text-align:center;margin-top:16px;
+  font-size:0.76rem;color:var(--muted);font-weight:600;
+}
+.note a{color:var(--primary);text-decoration:none;font-weight:800;}
+.note a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="page-bg"></div>
+<div class="dot-grid"></div>
+
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- Logo — same as nav bar -->
+    <div class="logo-row">
+      <div class="logo-box">📘</div>
+      <div class="logo-txt">StudyFlow</div>
+    </div>
+
+    <!-- Tabs: Login / Signup -->
+    <div class="tabs" id="tabRow">
+      <button class="tab active" onclick="switchTab('login')">Login</button>
+      <button class="tab" onclick="switchTab('signup')">Signup</button>
+    </div>
+
+    <!-- ── LOGIN FORM ── -->
+    <div class="form-sec active" id="loginForm">
+      <h2 class="card-title" style="text-align:left;font-size:1rem;color:var(--muted);font-weight:700;margin-bottom:18px;">Welcome back 👋 Sign in to continue</h2>
+      <div id="lMsg" class="msg err"></div>
+      <div class="fg">
+        <label>Username</label>
+        <div class="iw">
+          <span class="ii">👤</span>
+          <input type="text" id="lUser" placeholder="Enter your username" autocomplete="username"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Password</label>
+        <div class="iw">
+          <span class="ii">🔒</span>
+          <input type="password" id="lPass" placeholder="Enter your password" autocomplete="current-password"/>
+          <button class="show-pw" type="button" onclick="togglePw('lPass',this)">Show</button>
+        </div>
+      </div>
+      <button class="btn-submit" id="lBtn" onclick="doLogin()">Login</button>
+      <p class="note" style="margin-top:14px;">Not a member? <a href="#" onclick="switchTab('signup');return false;">Signup now</a></p>
+    </div>
+
+    <!-- ── SIGNUP FORM ── -->
+    <div class="form-sec" id="signupForm">
+      <h2 class="card-title" style="text-align:left;font-size:1rem;color:var(--muted);font-weight:700;margin-bottom:18px;">Create your account 🎓</h2>
+      <div id="sMsg" class="msg err"></div>
+      <div class="fg">
+        <label>Full Name</label>
+        <div class="iw">
+          <span class="ii">✏️</span>
+          <input type="text" id="sName" placeholder="Your full name"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Username</label>
+        <div class="iw">
+          <span class="ii">👤</span>
+          <input type="text" id="sUser" placeholder="Choose a username"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Password</label>
+        <div class="iw">
+          <span class="ii">🔒</span>
+          <input type="password" id="sPass" placeholder="Create a password"/>
+          <button class="show-pw" type="button" onclick="togglePw('sPass',this)">Show</button>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="doSignup()">Create Account</button>
+      <p class="note" style="margin-top:14px;">Already a member? <a href="#" onclick="switchTab('login');return false;">Login now</a></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Tab switch ───────────────────────────────────────────────────
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>
+    el.classList.toggle('active',(i===0&&t==='login')||(i===1&&t==='signup')));
+  document.getElementById('loginForm').classList.toggle('active', t==='login');
+  document.getElementById('signupForm').classList.toggle('active', t==='signup');
+  hide('lMsg'); hide('sMsg');
+}
+
+// ── Show/hide password ───────────────────────────────────────────
+function togglePw(id, btn){
+  const el=document.getElementById(id);
+  el.type = el.type==='password' ? 'text' : 'password';
+  btn.textContent = el.type==='password' ? 'Show' : 'Hide';
+}
+
+// ── Messages ─────────────────────────────────────────────────────
+function show(id, txt, type='err'){
+  const el=document.getElementById(id);
+  el.textContent=(type==='err'?'❌ ':'✅ ')+txt;
+  el.className='msg '+type+' show';
+}
+function hide(id){ document.getElementById(id).classList.remove('show'); }
+
+// ── Login ────────────────────────────────────────────────────────
+async function doLogin(){
+  const u=document.getElementById('lUser').value.trim();
+  const p=document.getElementById('lPass').value;
+  hide('lMsg');
+  if(!u||!p){ show('lMsg','Please fill in all fields.'); return; }
+  const btn=document.getElementById('lBtn');
+  btn.disabled=true; btn.textContent='Logging in...';
+  try{
+    const r=await fetch('/api/auth/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:u, password:p})
+    });
+    const d=await r.json();
+    if(d.error){ show('lMsg',d.error); btn.disabled=false; btn.textContent='Login'; return; }
+    show('lMsg',`Welcome back, ${d.name}!`,'ok');
+    setTimeout(()=>window.location.href='/planner', 800);
+  }catch(e){
+    show('lMsg','Cannot connect to server. Is Flask running?');
+    btn.disabled=false; btn.textContent='Login';
+  }
+}
+
+// ── Signup ───────────────────────────────────────────────────────
+async function doSignup(){
+  const n=document.getElementById('sName').value.trim();
+  const u=document.getElementById('sUser').value.trim();
+  const p=document.getElementById('sPass').value;
+  hide('sMsg');
+  if(!n||!u||!p){ show('sMsg','Please fill in all fields.'); return; }
+  if(p.length<6){ show('sMsg','Password must be at least 6 characters.'); return; }
+  try{
+    const r=await fetch('/api/auth/register',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:u, name:n, password:p})
+    });
+    const d=await r.json();
+    if(d.error){ show('sMsg',d.error); return; }
+    show('sMsg',`Account created! Welcome, ${d.name}!`,'ok');
+    setTimeout(()=>window.location.href='/planner', 800);
+  }catch(e){
+    show('sMsg','Cannot connect to server. Is Flask running?');
+  }
+}
+
+// ── Logout ───────────────────────────────────────────────────────
+async function doLogout(){
+  await fetch('/api/auth/logout',{method:'POST'});
+  sessionStorage.removeItem('studyflow_schedule');
+  document.getElementById('profileCard').classList.remove('show');
+  document.getElementById('tabRow').style.display='flex';
+  document.getElementById('loginForm').classList.add('active');
+  document.getElementById('signupForm').classList.remove('active');
+}
+
+// ── Check session on load ────────────────────────────────────────
+window.onload=async()=>{
+  try{
+    const r=await fetch('/api/auth/me');
+    const d=await r.json();
+    if(d.logged_in){
+      // Already logged in — go straight to planner, don't show login page
+      window.location.href='/planner';
+      return;
+    }
+  }catch(e){}
+  // Not logged in — show login tab by default, hide profile card
+  document.getElementById('profileCard').style.display='none';
+};
+
+// Enter key support
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('loginForm').classList.contains('active')) doLogin();
+    else doSignup();
+  }
+});
+</script>
+</body>
+</html>

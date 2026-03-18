@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Schedule — StudyFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f0;--white:#fff;--surface2:#f0ede6;--surface3:#ebe7de;
+  --primary:#2563eb;--primary-l:#dbeafe;--primary-d:#1d4ed8;
+  --amber:#f59e0b;--amber-l:#fef3c7;
+  --green:#10b981;--green-l:#d1fae5;
+  --red:#ef4444;--red-l:#fee2e2;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --text:#111827;--text2:#374151;--muted:#6b7280;
+  --border:#e2ddd4;--border2:#ccc8be;
+  --shadow:0 2px 8px rgba(0,0,0,0.07),0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.09);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+.page-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 700px 500px at 0% 0%,rgba(37,99,235,0.05),transparent 70%),
+    radial-gradient(ellipse 600px 400px at 100% 100%,rgba(245,158,11,0.05),transparent 70%);}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:200;height:58px;padding:0 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:rgba(246,245,240,0.96);backdrop-filter:blur(18px);
+  border-bottom:1.5px solid var(--border);}
+.logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--primary);
+  text-decoration:none;display:flex;align-items:center;gap:7px;}
+.logo-box{width:28px;height:28px;background:var(--primary);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.82rem;}
+.v-badge{background:var(--amber);color:#fff;font-size:0.55rem;font-weight:800;padding:2px 6px;border-radius:20px;letter-spacing:1px;}
+.nav-acts{display:flex;gap:9px;align-items:center;}
+.btn{padding:8px 18px;border-radius:9px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;
+  cursor:pointer;transition:all .2s;border:none;display:flex;align-items:center;gap:6px;text-decoration:none;}
+.btn-gh{background:transparent;color:var(--muted);border:1.5px solid var(--border2);}
+.btn-gh:hover{border-color:var(--primary);color:var(--primary);}
+.btn-pr{background:var(--primary);color:#fff;box-shadow:0 2px 10px rgba(37,99,235,0.25);}
+.btn-pr:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(37,99,235,0.38);}
+
+/* App layout */
+.app{position:relative;z-index:1;display:flex;height:calc(100vh - 58px);}
+
+/* Sidebar */
+.sidebar{width:280px;min-width:280px;background:#fff;border-right:1.5px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;}
+.sb-header{padding:18px 18px 14px;border-bottom:1px solid var(--border);}
+.sb-header h3{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;color:var(--text);margin-bottom:3px;}
+.sb-header p{font-size:0.74rem;color:var(--muted);font-weight:600;}
+.sb-scroll{flex:1;overflow-y:auto;padding:14px;}
+.sb-scroll::-webkit-scrollbar{width:3px;}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+/* Progress cards */
+.pcard{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;
+  padding:14px;margin-bottom:9px;transition:border-color .2s;}
+.pcard:hover{border-color:var(--primary);}
+.pc-head{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.pc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.pc-name{font-weight:800;font-size:0.87rem;flex:1;}
+.pc-pct{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.82rem;}
+.pbar{height:5px;background:rgba(0,0,0,0.07);border-radius:3px;overflow:hidden;}
+.pfill{height:100%;border-radius:3px;transition:width .5s ease;}
+.pc-stats{display:flex;justify-content:space-between;margin-top:6px;}
+.pc-sl{font-size:0.68rem;color:var(--muted);font-weight:700;}
+.pc-sv{font-size:0.68rem;font-weight:800;}
+
+/* Stats row */
+.sb-stats{padding:14px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.mstat{background:var(--surface2);border-radius:9px;padding:11px;text-align:center;}
+.msn{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.25rem;}
+.msl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-top:2px;font-weight:700;}
+
+/* Main */
+.main{flex:1;overflow-y:auto;padding:22px;}
+.main::-webkit-scrollbar{width:5px;}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* Month header */
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.mtitle{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;letter-spacing:-0.5px;color:var(--text);}
+.mnav{display:flex;gap:7px;}
+.mbtn{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:8px;
+  padding:7px 14px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;transition:all .2s;}
+.mbtn:hover{border-color:var(--primary);color:var(--primary);}
+.mbtn:disabled{opacity:0.35;cursor:not-allowed;}
+
+/* Legend */
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:16px;align-items:center;}
+.leg{display:flex;align-items:center;gap:5px;font-size:0.74rem;font-weight:700;color:var(--muted);}
+.ldot{width:9px;height:9px;border-radius:2px;}
+
+/* Calendar grid */
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:28px;}
+.cdh{text-align:center;font-size:0.66rem;font-weight:800;color:var(--muted);
+  letter-spacing:0.8px;text-transform:uppercase;padding:6px 0;}
+.cd{background:#fff;border:1.5px solid var(--border);border-radius:11px;
+  min-height:100px;padding:7px;cursor:pointer;transition:all .2s;
+  display:flex;flex-direction:column;position:relative;}
+.cd:hover{border-color:var(--primary);transform:translateY(-1px);box-shadow:var(--shadow-lg);}
+.cd.empty{background:transparent;border-color:transparent;cursor:default;}
+.cd.empty:hover{transform:none;box-shadow:none;}
+.cd.today{border-color:var(--green);box-shadow:0 0 0 2px rgba(16,185,129,0.18);}
+.cd.exam-d{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.5);}
+.cd.off-d{background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.3);cursor:default;}
+.cd.off-d:hover{transform:none;box-shadow:none;}
+.cd.past{opacity:0.6;}
+
+.cd-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.82rem;
+  margin-bottom:3px;display:flex;align-items:center;justify-content:space-between;line-height:1;}
+.day-badge{font-size:0.58rem;padding:1px 5px;border-radius:20px;font-weight:800;letter-spacing:0.3px;}
+.b-exam{background:rgba(245,158,11,0.2);color:#92400e;}
+.b-off{background:rgba(239,68,68,0.15);color:var(--red);}
+.b-today{background:rgba(16,185,129,0.2);color:#065f46;}
+
+/* ── Task chip — KEY FEATURE: shows hours ── */
+.task-chip{
+  padding:3px 6px;border-radius:5px;margin-bottom:2px;
+  font-size:0.61rem;font-weight:800;
+  display:flex;align-items:center;gap:4px;
+  cursor:pointer;transition:opacity .15s;
+  overflow:hidden;
+}
+.task-chip:hover{opacity:0.8;}
+.task-chip.done{opacity:0.38;text-decoration:line-through;}
+.chip-check{width:7px;height:7px;border-radius:50%;flex-shrink:0;border:1.5px solid currentColor;}
+.chip-check.checked{background:currentColor;}
+.chip-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* Hours badge — shown next to subject name */
+.chip-hrs{
+  background:rgba(255,255,255,0.55);
+  border-radius:3px;padding:0px 4px;
+  font-size:0.56rem;font-weight:900;white-space:nowrap;flex-shrink:0;
+  letter-spacing:0.2px;
+}
+
+.exam-label{font-size:0.65rem;color:#92400e;font-weight:800;padding:1px 0;}
+.off-label{font-size:0.65rem;color:var(--red);font-weight:700;}
+
+/* Total hours indicator on day */
+.day-total-hrs{
+  margin-top:auto;padding-top:3px;
+  font-size:0.6rem;color:var(--muted);font-weight:800;
+  border-top:1px dashed rgba(0,0,0,0.07);
+  display:flex;align-items:center;gap:3px;
+}
+
+/* Day detail panel */
+.panel{position:fixed;right:0;top:58px;bottom:0;width:370px;
+  background:#fff;border-left:1.5px solid var(--border);
+  transform:translateX(100%);transition:transform .3s ease;
+  overflow-y:auto;z-index:150;display:flex;flex-direction:column;}
+.panel.open{transform:translateX(0);}
+.panel::-webkit-scrollbar{width:3px;}
+.panel::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.panel-head{padding:20px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:#fff;z-index:1;}
+.pclose{position:absolute;top:18px;right:18px;background:var(--surface2);
+  border:1.5px solid var(--border);color:var(--muted);width:30px;height:30px;
+  border-radius:8px;cursor:pointer;font-size:0.85rem;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;}
+.pclose:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+.p-date{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;margin-bottom:3px;}
+.p-type{font-size:0.78rem;color:var(--muted);font-weight:600;}
+/* Hours summary bar in panel */
+.hours-summary{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px;
+}
+.hs-chip{
+  background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+  padding:6px 10px;text-align:center;min-width:70px;
+}
+.hs-num{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;}
+.hs-label{font-size:0.62rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;margin-top:1px;}
+
+.panel-body{padding:18px;flex:1;}
+
+/* Study tasks in panel */
+.ptask{background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;
+  padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;
+  transition:all .2s;margin-bottom:8px;}
+.ptask:hover{border-color:var(--primary);}
+.ptask.done{opacity:0.45;}
+.ptask-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border2);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;transition:all .2s;font-weight:900;}
+.ptask.done .ptask-check{background:var(--green);border-color:var(--green);color:#fff;}
+.ptask-info{flex:1;}
+.ptask-name{font-weight:800;font-size:0.88rem;}
+/* Hours shown prominently in panel task */
+.ptask-hrs{
+  font-size:0.72rem;color:var(--muted);margin-top:3px;font-weight:700;
+  display:flex;align-items:center;gap:5px;
+}
+.ptask-hrs-badge{
+  background:var(--primary-l);color:var(--primary);
+  padding:1px 7px;border-radius:20px;font-size:0.68rem;font-weight:900;
+}
+.ptask-strip{width:4px;border-radius:2px;align-self:stretch;min-height:20px;flex-shrink:0;}
+
+/* Hourly timetable in panel */
+.hblock{display:flex;gap:12px;align-items:flex-start;padding:9px 0;
+  border-bottom:1px solid rgba(0,0,0,0.04);}
+.hblock:last-child{border-bottom:none;}
+.htime{font-size:0.71rem;font-weight:800;color:var(--muted);width:44px;
+  flex-shrink:0;padding-top:2px;font-family:'Nunito',sans-serif;}
+.hbar{width:3px;border-radius:2px;align-self:stretch;min-height:28px;flex-shrink:0;}
+.hinfo{flex:1;}
+.hact{font-size:0.82rem;font-weight:700;}
+.hdur{font-size:0.68rem;color:var(--muted);margin-top:1px;font-weight:600;}
+.b-study .hbar{background:var(--primary);}
+.b-college .hbar{background:var(--amber);}
+.b-meal .hbar{background:var(--green);}
+.b-sleep .hbar{background:#6b7280;}
+.b-routine .hbar{background:var(--border2);}
+.b-break .hbar{background:#a78bfa;}
+.b-free .hbar{background:#34d399;}
+.b-blocked .hbar{background:var(--red);}
+
+/* No schedule */
+.nosched{text-align:center;padding:80px 40px;}
+.nosched h2{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.8rem;margin-bottom:10px;}
+.nosched p{color:var(--muted);margin-bottom:28px;font-weight:600;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .panel{width:100%;}
+}
+@media(max-width:580px){
+  .main{padding:12px;}
+  .cg{gap:3px;}
+  .cd{min-height:72px;padding:5px;}
+}
+</style>
+</head>
+<body>
+<div class="page-bg"></div>
+
+<nav>
+  <a href="/planner" class="logo"><div class="logo-box">📘</div>StudyFlow</a>
+  <div class="nav-acts">
+    <span id="navUser" style="font-size:0.82rem;font-weight:700;color:var(--muted);"></span>
+    <button class="btn btn-gh" onclick="createNewSchedule()">🔄 New Schedule</button>
+    <button class="btn btn-pr" onclick="window.print()">📥 Print / Export</button>
+    <button class="btn btn-gh" onclick="doLogout()" id="logoutBtn" style="display:none;">🚪 Logout</button>
+  </div>
+</nav>
+
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sb-header">
+      <h3>Subject Progress</h3>
+      <p>Click tasks to mark as completed</p>
+    </div>
+    <div class="sb-scroll" id="progCards"></div>
+    <div class="sb-stats" id="sbStats"></div>
+  </div>
+
+  <!-- Main Calendar -->
+  <div class="main" id="mainArea">
+    <div id="noSched" class="nosched" style="display:none;">
+      <div style="font-size:3rem;margin-bottom:14px;">📅</div>
+      <h2>No Schedule Found</h2>
+      <p>Create a study schedule first to see your calendar here.</p>
+      <a href="/planner" class="btn btn-pr" style="display:inline-flex;font-size:0.95rem;padding:13px 30px;">Create My Schedule</a>
+    </div>
+    <div id="calArea"></div>
+  </div>
+</div>
+
+<!-- Day detail panel -->
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <button class="pclose" onclick="closePanel()">✕</button>
+    <div class="p-date" id="pDate"></div>
+    <div class="p-type" id="pType"></div>
+    <div class="hours-summary" id="pHoursSummary"></div>
+  </div>
+  <div class="panel-body" id="pBody"></div>
+</div>
+
+<script>
+let sched=null, comp={}, curMonth=0, months=[];
+
+function saveComp(){localStorage.setItem('sf_comp',JSON.stringify(comp));}
+
+function buildMonths(){
+  const map={};
+  sched.days.forEach(d=>{
+    const [y,m]=d.date.split('-');const k=`${y}-${m}`;
+    if(!map[k])map[k]={y:parseInt(y),m:parseInt(m),days:[]};
+    map[k].days.push(d);
+  });
+  months=Object.values(map).sort((a,b)=>a.y*100+a.m-(b.y*100+b.m));
+  curMonth=0;
+}
+
+// ── Render Calendar ──────────────────────────────────────────────
+function renderCal(){
+  const area=document.getElementById('calArea');
+  if(!months.length){area.innerHTML='<p style="color:var(--muted);text-align:center;padding:40px;font-weight:700;">No days in schedule.</p>';return;}
+  const mo=months[curMonth];
+  const mname=new Date(mo.y,mo.m-1,1).toLocaleString('default',{month:'long',year:'numeric'});
+  const today=new Date().toISOString().split('T')[0];
+  const firstWd=new Date(mo.y,mo.m-1,1).getDay();
+  const dim=new Date(mo.y,mo.m,0).getDate();
+  const dayMap={};mo.days.forEach(d=>dayMap[parseInt(d.date.split('-')[2])]=d);
+
+  let h=`
+  <div class="mh">
+    <div class="mtitle">${mname}</div>
+    <div class="mnav">
+      <button class="mbtn" onclick="changeMonth(-1)" ${curMonth===0?'disabled':''}>‹ Prev</button>
+      <button class="mbtn" onclick="changeMonth(1)" ${curMonth===months.length-1?'disabled':''}>Next ›</button>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="ldot" style="background:var(--primary)"></div>Study Day</div>
+    <div class="leg"><div class="ldot" style="background:var(--amber)"></div>Exam Day</div>
+    <div class="leg"><div class="ldot" style="background:var(--red)"></div>Unavailable</div>
+    <div class="leg"><div class="ldot" style="background:var(--green);border-radius:50%"></div>Today</div>
+    <div class="leg" style="margin-left:auto;color:var(--primary);font-size:0.7rem;">Hours shown on each task ⏱</div>
+  </div>
+  <div class="cg">
+    <div class="cdh">Sun</div><div class="cdh">Mon</div><div class="cdh">Tue</div>
+    <div class="cdh">Wed</div><div class="cdh">Thu</div><div class="cdh">Fri</div><div class="cdh">Sat</div>`;
+
+  for(let i=0;i<firstWd;i++)h+=`<div class="cd empty"></div>`;
+
+  for(let d=1;d<=dim;d++){
+    const dayData=dayMap[d];
+    const ds=`${mo.y}-${String(mo.m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=ds===today,isPast=ds<today;
+    if(!dayData){h+=`<div class="cd${isToday?' today':''}${isPast?' past':''}"><div class="cd-num">${d}${isToday?'<span class="day-badge b-today">TODAY</span>':''}</div></div>`;continue;}
+
+    let cls='cd';
+    if(isToday)cls+=' today';if(isPast)cls+=' past';
+    if(dayData.day_type==='exam')cls+=' exam-d';
+    if(dayData.day_type==='unavailable')cls+=' off-d';
+
+    let inner=`<div class="cd-num">${d}`;
+    if(isToday)inner+=`<span class="day-badge b-today">TODAY</span>`;
+    else if(dayData.day_type==='exam')inner+=`<span class="day-badge b-exam">EXAM</span>`;
+    else if(dayData.day_type==='unavailable')inner+=`<span class="day-badge b-off">OFF</span>`;
+    inner+='</div>';
+
+    if(dayData.day_type==='exam'){
+      dayData.exam_subjects.forEach(s=>inner+=`<div class="exam-label">📝 ${s}</div>`);
+    } else if(dayData.day_type==='unavailable'){
+      inner+=`<div class="off-label">✗ Unavailable · Click for routine</div>`;
+    } else if(dayData.tasks&&dayData.tasks.length){
+      // Show blocked hours badge if any
+      if(dayData.blocked_hours&&dayData.blocked_hours.length){
+        dayData.blocked_hours.forEach(bh=>{
+          const dur=Math.round((bh.to_min-bh.from_min)/60*10)/10;
+          inner+=`<div style="font-size:0.58rem;background:rgba(245,158,11,0.15);color:#92400e;border-radius:4px;padding:2px 5px;margin-bottom:2px;font-weight:700;">⏰ ${bh.reason} ${dur}h blocked</div>`;
+        });
+      }
+      let totalHrs=0;
+      dayData.tasks.slice(0,4).forEach(t=>{
+        const key=`${ds}|${t.subject}`;const done=comp[key]||false;
+        totalHrs+=parseFloat(t.hours||0);
+        // Color-derived text and bg
+        const bg=hexToRgba(t.color,0.14);
+        inner+=`<div class="task-chip${done?' done':''}" 
+          style="background:${bg};color:${t.color};"
+          onclick="toggleTask('${ds}','${escS(t.subject)}',event)">
+          <div class="chip-check${done?' checked':''}"></div>
+          <span class="chip-name">${t.subject}</span>
+          <span class="chip-hrs">${t.hours}h</span>
+        </div>`;
+      });
+      if(dayData.tasks.length>4){
+        const more=dayData.tasks.slice(4).reduce((a,t)=>a+parseFloat(t.hours||0),0);
+        inner+=`<div style="font-size:0.6rem;color:var(--muted);font-weight:700;padding:1px 0;">+${dayData.tasks.length-4} more · ${more.toFixed(1)}h</div>`;
+        totalHrs+=more;
+      }
+      // Total hours for the day
+      inner+=`<div class="day-total-hrs">⏱ <span style="color:var(--primary);font-family:'Nunito',sans-serif;">${totalHrs.toFixed(1)}h</span> total study</div>`;
+    }
+
+    h+=`<div class="${cls}" onclick="openDay('${ds}')">${inner}</div>`;
+  }
+  h+=`</div>`;
+
+  // Bottom nav
+  h+=`<div style="display:flex;justify-content:space-between;margin-bottom:20px;align-items:center;">
+    <button class="mbtn" onclick="changeMonth(-1)" ${curMonth===0?'disabled':''}>‹ Previous Month</button>
+    <span style="font-size:0.82rem;color:var(--muted);font-weight:700;">Month ${curMonth+1} of ${months.length}</span>
+    <button class="mbtn" onclick="changeMonth(1)" ${curMonth===months.length-1?'disabled':''}>Next Month ›</button>
+  </div>`;
+  area.innerHTML=h;
+}
+function changeMonth(dir){
+  curMonth=Math.max(0,Math.min(months.length-1,curMonth+dir));
+  renderCal();
+}
+
+// ── Toggle task ──────────────────────────────────────────────────
+function toggleTask(date,subject,e){
+  if(e)e.stopPropagation();
+  const k=`${date}|${subject}`;comp[k]=!comp[k];
+  // Save to MySQL (non-blocking)
+  fetch('/api/completion/save',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({date,subject,completed:comp[k]})}).catch(()=>{
+    // fallback to localStorage
+    localStorage.setItem('sf_comp',JSON.stringify(comp));
+  });
+  localStorage.setItem('sf_comp',JSON.stringify(comp)); // always keep local copy too
+  renderCal();renderProgress();
+  if(document.getElementById('panel').classList.contains('open'))openDay(date);
+}
+
+// ── Open day panel ────────────────────────────────────────────────
+function openDay(ds){
+  const dayData=sched.days.find(d=>d.date===ds);if(!dayData)return;
+  const d=new Date(ds+'T12:00:00');
+  document.getElementById('pDate').textContent=d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  let typeStr='';
+  if(dayData.day_type==='exam')typeStr='📝 Exam Day';
+  else if(dayData.day_type==='unavailable')typeStr='🚫 Unavailable / Off Day  ·  Includes 1h light revision';
+  else{
+    const totalH=(dayData.tasks||[]).reduce((a,t)=>a+parseFloat(t.hours||0),0);
+    typeStr=`📚 Study Day  ·  ${(dayData.free_hours||6).toFixed(1)}h free  ·  ${totalH.toFixed(1)}h study`;
+  }
+  document.getElementById('pType').textContent=typeStr;
+
+  // Hours summary chips — for unavailable days show a special banner
+  let sumHtml='';
+  if(dayData.day_type==='unavailable'){
+    sumHtml=`
+      <div class="hs-chip" style="grid-column:1/-1;background:rgba(239,68,68,0.06);border-color:rgba(239,68,68,0.2);">
+        <div class="hs-num" style="color:var(--red);font-size:0.82rem;">🚫 Off Day — You are OUT</div>
+        <div class="hs-label">Light revision scheduled after you return home in the evening</div>
+      </div>
+      <div class="hs-chip"><div class="hs-num" style="color:var(--primary)">1h</div><div class="hs-label">Evening Study</div></div>
+      <div class="hs-chip"><div class="hs-num" style="color:#6b7280">${parseFloat((sched.routine||{}).sleep_hours||7).toFixed(0)}h</div><div class="hs-label">Sleep</div></div>`;
+  } else if(dayData.tasks&&dayData.tasks.length){
+    const totalH=(dayData.tasks).reduce((a,t)=>a+parseFloat(t.hours||0),0);
+    const doneH=(dayData.tasks).filter(t=>comp[`${ds}|${t.subject}`]).reduce((a,t)=>a+parseFloat(t.hours||0),0);
+    const freeH=parseFloat(dayData.free_hours||6);
+    const sleepH=parseFloat((sched.routine||{}).sleep_hours||7);
+    const collH=parseFloat((sched.routine||{}).college_hours||6);
+    sumHtml=`
+      <div class="hs-chip"><div class="hs-num" style="color:var(--primary)">${totalH.toFixed(1)}h</div><div class="hs-label">Study</div></div>
+      <div class="hs-chip"><div class="hs-num" style="color:var(--green)">${doneH.toFixed(1)}h</div><div class="hs-label">Done ✓</div></div>
+      <div class="hs-chip"><div class="hs-num" style="color:var(--amber)">${(totalH-doneH).toFixed(1)}h</div><div class="hs-label">Left</div></div>
+      <div class="hs-chip"><div class="hs-num" style="color:#6b7280">${freeH.toFixed(1)}h</div><div class="hs-label">Free Time</div></div>
+      <div class="hs-chip"><div class="hs-num" style="color:#6366f1">${sleepH.toFixed(0)}h</div><div class="hs-label">Sleep</div></div>
+      <div class="hs-chip"><div class="hs-num" style="color:var(--amber)">${collH.toFixed(0)}h</div><div class="hs-label">College</div></div>`;
+  }
+  document.getElementById('pHoursSummary').innerHTML=sumHtml;
+
+  let body='';
+
+  // Tasks with proportional note
+  if(dayData.tasks&&dayData.tasks.length){
+    // Compute total needed_hours across subjects for proportion display
+    const totalNeeded=dayData.tasks.reduce((a,t)=>a+(t.needed_hours||1),0);
+    body+=`<p style="font-size:0.74rem;font-weight:800;color:var(--primary);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">📚 Today's Study Tasks</p>`;
+    body+=`<p style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:12px;">⚖️ Hours allocated proportionally based on syllabus weight</p>`;
+    dayData.tasks.forEach(t=>{
+      const k=`${ds}|${t.subject}`;const done=comp[k]||false;
+      const weight=totalNeeded>0?Math.round((t.needed_hours||1)/totalNeeded*100):0;
+      body+=`<div class="ptask${done?' done':''}" onclick="toggleTask('${ds}','${escS(t.subject)}')">
+        <div class="ptask-strip" style="background:${t.color}"></div>
+        <div class="ptask-check">${done?'✓':''}</div>
+        <div class="ptask-info">
+          <div class="ptask-name">${t.subject}</div>
+          <div class="ptask-hrs">
+            <span class="ptask-hrs-badge" style="background:${hexToRgba(t.color,0.15)};color:${t.color}">⏱ ${t.hours}h today</span>
+            <span style="font-size:0.67rem;color:var(--muted);margin-left:5px;">${weight}% of syllabus weight</span>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+
+  if(dayData.exam_subjects&&dayData.exam_subjects.length){
+    body+=`<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.35);border-radius:12px;padding:14px;margin-bottom:18px;">
+      <p style="color:#92400e;font-weight:800;font-size:0.88rem;margin-bottom:7px;">📝 Exam${dayData.exam_subjects.length>1?'s':''} Today</p>
+      ${dayData.exam_subjects.map(s=>`<p style="font-size:0.88rem;margin-top:3px;font-weight:700;">• ${s}</p>`).join('')}
+    </div>`;
+  }
+
+  // Hourly timetable
+  if(dayData.hourly&&dayData.hourly.length){
+    body+=`<p style="font-size:0.74rem;font-weight:800;color:var(--primary);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;margin-top:18px;">⏰ Hour-by-Hour Timetable</p>`;
+    dayData.hourly.forEach(b=>{
+      const tc='b-'+(b.type||'routine');
+      const dur=b.duration>=60?`${Math.floor(b.duration/60)}h ${b.duration%60>0?b.duration%60+'m':''}`.trim():`${b.duration}m`;
+      body+=`<div class="hblock ${tc}">
+        <div class="htime">${b.time}</div>
+        <div class="hbar"></div>
+        <div class="hinfo">
+          <div class="hact">${b.activity}</div>
+          <div class="hdur">${dur}</div>
+        </div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('pBody').innerHTML=body;
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel(){document.getElementById('panel').classList.remove('open');}
+
+// ── Progress sidebar ─────────────────────────────────────────────
+function renderProgress(){
+  if(!sched)return;
+  const subjs=sched.subjects||[];
+  const tot={},dn={};
+  subjs.forEach(s=>{tot[s.name]=0;dn[s.name]=0;});
+  sched.days.forEach(day=>{
+    if(!day.tasks)return;
+    day.tasks.forEach(t=>{
+      tot[t.subject]=(tot[t.subject]||0)+1;
+      if(comp[`${day.date}|${t.subject}`])dn[t.subject]=(dn[t.subject]||0)+1;
+    });
+  });
+  // Hours per subject
+  const hrs={};
+  subjs.forEach(s=>hrs[s.name]=0);
+  sched.days.forEach(day=>{
+    if(!day.tasks)return;
+    day.tasks.forEach(t=>{hrs[t.subject]=(hrs[t.subject]||0)+parseFloat(t.hours||0);});
+  });
+
+  document.getElementById('progCards').innerHTML=subjs.map(s=>{
+    const t=tot[s.name]||0,d=dn[s.name]||0,pct=t?Math.round(d/t*100):0;
+    return `<div class="pcard">
+      <div class="pc-head">
+        <div class="pc-dot" style="background:${s.color}"></div>
+        <div class="pc-name">${s.name}</div>
+        <div class="pc-pct" style="color:${s.color}">${pct}%</div>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${pct}%;background:${s.color}"></div></div>
+      <div class="pc-stats">
+        <span class="pc-sl">${d}/${t} sessions done</span>
+        <span class="pc-sv">${hrs[s.name]?hrs[s.name].toFixed(0)+'h total':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  const totSess=Object.values(tot).reduce((a,b)=>a+b,0);
+  const dnSess=Object.values(dn).reduce((a,b)=>a+b,0);
+  const pct=totSess?Math.round(dnSess/totSess*100):0;
+  const studyDays=sched.total_study_days||0;
+  document.getElementById('sbStats').innerHTML=`
+    <div class="mstat"><div class="msn" style="color:var(--green)">${pct}%</div><div class="msl">Overall</div></div>
+    <div class="mstat"><div class="msn" style="color:var(--primary)">${studyDays}</div><div class="msl">Study Days</div></div>
+    <div class="mstat"><div class="msn" style="color:var(--amber)">${dnSess}</div><div class="msl">Sessions Done</div></div>
+    <div class="mstat"><div class="msn" style="color:var(--purple)">${subjs.length}</div><div class="msl">Subjects</div></div>`;
+}
+
+// ── Session / Auth ───────────────────────────────────────────────
+window.onload=async()=>{
+  // Check MySQL session
+  try{
+    const r=await fetch('/api/auth/me');const d=await r.json();
+    if(d.logged_in){
+      document.getElementById('navUser').textContent='👤 '+d.name;
+      document.getElementById('logoutBtn').style.display='flex';
+    }
+  }catch(e){}
+
+  // Try loading from sessionStorage first (just generated)
+  let raw=sessionStorage.getItem('studyflow_schedule');
+
+  // If not in sessionStorage, try MySQL (returning user)
+  if(!raw){
+    try{
+      const r=await fetch('/api/schedule/load');
+      const d=await r.json();
+      if(d.found){
+        raw=JSON.stringify(d.schedule);
+        // Show "loaded from saved" banner
+        const banner=document.createElement('div');
+        banner.style.cssText='position:fixed;top:70px;right:20px;z-index:999;background:#d1fae5;border:1.5px solid rgba(16,185,129,0.4);border-radius:10px;padding:10px 16px;font-size:0.82rem;font-weight:700;color:#065f46;box-shadow:0 4px 14px rgba(0,0,0,0.08);';
+        banner.textContent=`✅ Schedule loaded from your account (saved ${d.saved_at.slice(0,10)})`;
+        document.body.appendChild(banner);
+        setTimeout(()=>banner.remove(),4000);
+      }
+    }catch(e){}
+  }
+
+  if(!raw){
+    document.getElementById('noSched').style.display='block';
+    document.querySelector('.sidebar').style.display='none';
+    return;
+  }
+  sched=JSON.parse(raw);
+
+  // Load completions from MySQL if logged in
+  try{
+    const r=await fetch('/api/completion/load');
+    const d=await r.json();
+    if(d.completions) comp=d.completions;
+  }catch(e){
+    // Fall back to localStorage
+    const saved=localStorage.getItem('sf_comp');if(saved)comp=JSON.parse(saved);
+  }
+
+  buildMonths();renderCal();renderProgress();
+};
+
+function doLogout(){
+  fetch('/api/auth/logout',{method:'POST'}).then(()=>{
+    sessionStorage.removeItem('studyflow_schedule');
+    window.location.href='/login';
+  });
+}
+
+async function createNewSchedule(){
+  if(!confirm('This will clear your saved schedule and create a new one. Are you sure?')) return;
+  // Delete saved schedule from MySQL
+  try{
+    await fetch('/api/schedule/delete',{method:'POST'});
+  }catch(e){}
+  sessionStorage.removeItem('studyflow_schedule');
+  window.location.href='/planner';
+}
+
+// ── Helpers ──────────────────────────────────────────────────────
+function hexToRgba(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+function escS(s){return s.replace(/'/g,"\\'");}
+</script>
+</body>
+</html>

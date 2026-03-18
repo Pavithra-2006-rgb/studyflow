@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Create Schedule — StudyFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f0;--white:#fff;--surface2:#f0ede6;
+  --primary:#2563eb;--primary-l:#dbeafe;--primary-d:#1d4ed8;
+  --amber:#f59e0b;--amber-l:#fef3c7;
+  --green:#10b981;--green-l:#d1fae5;
+  --red:#ef4444;--red-l:#fee2e2;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --text:#111827;--muted:#6b7280;
+  --border:#e2ddd4;--border2:#ccc8be;
+  --shadow:0 2px 8px rgba(0,0,0,0.07),0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-lg:0 10px 40px rgba(0,0,0,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+.page-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 700px 500px at 0% 0%,rgba(37,99,235,0.06),transparent 70%),
+    radial-gradient(ellipse 600px 400px at 100% 100%,rgba(124,58,237,0.05),transparent 70%);}
+.dot-grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(37,99,235,0.08) 1px,transparent 1px);
+  background-size:28px 28px;opacity:0.7;}
+
+nav{position:sticky;top:0;z-index:100;height:60px;padding:0 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(246,245,240,0.94);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);}
+.logo{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.25rem;color:var(--primary);
+  text-decoration:none;display:flex;align-items:center;gap:7px;}
+.logo-box{width:28px;height:28px;background:var(--primary);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;}
+.v-badge{background:var(--amber);color:#fff;font-size:0.56rem;font-weight:800;padding:2px 6px;border-radius:20px;letter-spacing:1px;}
+.nav-back{color:var(--muted);text-decoration:none;font-size:0.87rem;font-weight:700;
+  display:flex;align-items:center;gap:5px;transition:color .2s;}
+.nav-back:hover{color:var(--primary);}
+
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:44px 20px 80px;}
+.ph{text-align:center;margin-bottom:48px;}
+.ph h1{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;letter-spacing:-1px;
+  color:var(--text);margin-bottom:8px;}
+.ph p{color:var(--muted);font-size:0.95rem;font-weight:600;}
+
+/* Steps bar */
+.sbar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:40px;}
+.sdot{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.scirc{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:0.78rem;font-weight:800;font-family:'Nunito',sans-serif;
+  border:2px solid var(--border2);background:#fff;color:var(--muted);transition:all .3s;}
+.sdot.active .scirc{background:var(--primary);border-color:var(--primary);color:#fff;
+  box-shadow:0 2px 12px rgba(37,99,235,0.35);}
+.sdot.done .scirc{background:var(--green);border-color:var(--green);color:#fff;}
+.slabel{font-size:0.68rem;color:var(--muted);white-space:nowrap;font-weight:700;}
+.sdot.active .slabel{color:var(--primary);}
+.sdot.done .slabel{color:var(--green);}
+.sline{width:44px;height:2px;background:var(--border2);margin-bottom:19px;transition:background .3s;}
+.sline.done{background:var(--green);}
+
+/* Cards */
+.card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:32px;
+  display:none;animation:slideIn .35s ease;box-shadow:var(--shadow);}
+.card.active{display:block;}
+@keyframes slideIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.card-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.18rem;
+  margin-bottom:5px;color:var(--text);display:flex;align-items:center;gap:9px;}
+.card-desc{color:var(--muted);font-size:0.87rem;margin-bottom:26px;font-weight:500;line-height:1.6;}
+
+/* Form */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.fg{display:flex;flex-direction:column;gap:7px;margin-bottom:18px;}
+.fg label{font-size:0.82rem;font-weight:800;color:var(--text);letter-spacing:0.2px;}
+.fg input,.fg textarea,.fg select{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:10px;padding:11px 14px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:0.92rem;font-weight:600;
+  transition:border-color .2s,box-shadow .2s;outline:none;}
+.fg input:focus,.fg textarea:focus,.fg select:focus{
+  border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,0.12);background:#fff;}
+.fg textarea{resize:vertical;min-height:110px;line-height:1.55;}
+.hint{font-size:0.75rem;color:var(--muted);font-weight:600;}
+
+/* Date tags */
+.dtags{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;}
+.dtag{background:var(--red-l);border:1.5px solid rgba(239,68,68,0.3);color:var(--red);
+  padding:5px 11px;border-radius:100px;font-size:0.78rem;font-weight:700;
+  display:flex;align-items:center;gap:5px;}
+.dtag button{background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;line-height:1;padding:0;}
+
+/* Subjects */
+.slist{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+.sitem{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;
+  padding:14px 16px;display:flex;align-items:center;gap:14px;transition:border-color .2s;}
+.sitem:hover{border-color:var(--primary);}
+.sdot2{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.sinfo{flex:1;}
+.sname{font-weight:800;font-size:0.9rem;}
+.stopics{font-size:0.74rem;color:var(--muted);margin-top:2px;font-weight:600;}
+.srem{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px;transition:color .2s;}
+.srem:hover{color:var(--red);}
+
+.add-form{background:var(--surface2);border:1.5px dashed var(--border2);border-radius:14px;padding:20px;margin-bottom:18px;}
+.add-form-title{font-size:0.82rem;font-weight:800;color:var(--primary);margin-bottom:14px;}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;}
+.swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .15s;}
+.swatch.sel{border-color:var(--text);transform:scale(1.18);}
+.swatch:hover{transform:scale(1.12);}
+
+/* Units preview */
+.upreview{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px;
+  margin-top:10px;max-height:180px;overflow-y:auto;}
+.urow{display:flex;align-items:center;gap:9px;padding:5px 0;
+  border-bottom:1px solid rgba(0,0,0,0.05);}
+.urow:last-child{border-bottom:none;}
+.ubadge{background:var(--primary-l);color:var(--primary);padding:2px 7px;border-radius:5px;
+  font-size:0.7rem;font-weight:800;white-space:nowrap;}
+.uname{font-size:0.82rem;flex:1;font-weight:600;}
+.ucount{font-size:0.7rem;color:var(--muted);white-space:nowrap;font-weight:700;}
+
+/* PDF Upload Zone */
+.pdf-zone{
+  border:2px dashed var(--border2);border-radius:12px;padding:24px 16px;
+  text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);
+  margin-bottom:2px;
+}
+.pdf-zone:hover,.pdf-zone.dragover{
+  border-color:var(--primary);background:var(--primary-l);
+}
+.pdf-zone-icon{font-size:2rem;margin-bottom:6px;}
+.pdf-zone-text{font-size:0.88rem;font-weight:800;color:var(--text);margin-bottom:3px;}
+.pdf-zone-sub{font-size:0.72rem;color:var(--muted);font-weight:600;}
+
+/* PDF Success Card */
+.pdf-success-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--green-l);border:1.5px solid rgba(16,185,129,0.3);
+  border-radius:10px;padding:12px 14px;
+}
+.pdf-success-icon{font-size:1.4rem;flex-shrink:0;}
+.pdf-success-info{flex:1;}
+.pdf-success-name{font-weight:800;font-size:0.88rem;color:var(--text);}
+.pdf-success-meta{font-size:0.72rem;color:#059669;font-weight:700;margin-top:2px;}
+.pdf-remove-btn{background:none;border:1.5px solid rgba(16,185,129,0.4);color:#059669;
+  border-radius:7px;width:26px;height:26px;cursor:pointer;font-size:0.75rem;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.pdf-remove-btn:hover{background:var(--red-l);border-color:var(--red);color:var(--red);}
+
+/* PDF loading spinner inline */
+.pdf-loading{display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:var(--primary-l);border:1.5px solid rgba(37,99,235,0.2);border-radius:10px;}
+.pdf-spin{width:18px;height:18px;border-radius:50%;border:2px solid rgba(37,99,235,0.2);
+  border-top-color:var(--primary);animation:spin .7s linear infinite;flex-shrink:0;}
+.pdf-loading-text{font-size:0.82rem;font-weight:700;color:var(--primary);}
+
+/* Buttons */
+.nav-btns{display:flex;justify-content:space-between;align-items:center;
+  margin-top:28px;padding-top:22px;border-top:1px solid var(--border);}
+.btn{padding:12px 26px;border-radius:10px;font-family:'Nunito',sans-serif;
+  font-size:0.9rem;font-weight:800;cursor:pointer;transition:all .2s;border:none;
+  display:flex;align-items:center;gap:7px;}
+.btn-gh{background:transparent;color:var(--muted);border:1.5px solid var(--border2);}
+.btn-gh:hover{border-color:var(--primary);color:var(--primary);}
+.btn-pr{background:var(--primary);color:#fff;box-shadow:0 3px 14px rgba(37,99,235,0.3);}
+.btn-pr:hover{background:var(--primary-d);transform:translateY(-1px);box-shadow:0 6px 24px rgba(37,99,235,0.4);}
+.btn-gr{background:var(--green);color:#fff;box-shadow:0 3px 14px rgba(16,185,129,0.3);}
+.btn-gr:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(16,185,129,0.4);}
+
+/* Free time box */
+.freebox{background:var(--green-l);border:1.5px solid rgba(16,185,129,0.3);border-radius:12px;padding:18px;}
+.freebox-label{font-size:0.78rem;font-weight:800;color:var(--green);}
+.freebox-num{font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;color:#065f46;margin:6px 0 4px;}
+.freebox-sub{font-size:0.76rem;color:#059669;font-weight:700;}
+
+/* Review */
+.ritem{background:var(--surface2);border:1.5px solid var(--border);border-radius:11px;
+  padding:13px 16px;display:flex;align-items:center;gap:13px;}
+.ricon{font-size:1.2rem;}
+.rlabel{font-size:0.72rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:0.4px;}
+.rval{font-size:0.88rem;margin-top:2px;font-weight:700;}
+
+/* Loading */
+.loader-ov{position:fixed;inset:0;z-index:999;background:rgba(246,245,240,0.92);
+  backdrop-filter:blur(10px);display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;}
+.loader-ov.show{display:flex;}
+.spin{width:52px;height:52px;border-radius:50%;border:3px solid var(--border2);
+  border-top-color:var(--primary);animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lt{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:900;color:var(--text);}
+.ls{color:var(--muted);font-size:0.87rem;font-weight:600;}
+
+@media(max-width:600px){
+  .row2{grid-template-columns:1fr;}
+  nav{padding:0 14px;}
+  .wrap{padding:24px 12px 60px;}
+  .card{padding:20px 14px;}
+}
+</style>
+</head>
+<body>
+<div class="page-bg"></div><div class="dot-grid"></div>
+
+<div class="loader-ov" id="lo">
+  <div class="spin"></div>
+  <div class="lt">Generating Your Schedule...</div>
+  <div class="ls">Calculating optimal study distribution</div>
+</div>
+
+<nav>
+  <a href="/planner" class="logo"><div class="logo-box">📘</div>StudyFlow</a>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span id="navUser" style="font-size:0.82rem;font-weight:700;color:var(--muted);"></span>
+    <a href="/planner" class="nav-back"></a>
+    <button class="btn btn-gh" onclick="doLogout()" id="logoutBtn" style="display:none;padding:8px 16px;font-size:0.82rem;">🚪 Logout</button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="ph">
+    <h1>Create Your Study Plan</h1>
+    <p>Complete each step to build your personalized, hour-by-hour schedule</p>
+  </div>
+
+  <!-- Steps Bar -->
+  <div class="sbar">
+    <div class="sdot active" data-step="1"><div class="scirc">1</div><div class="slabel">Dates</div></div>
+    <div class="sline" id="l12"></div>
+    <div class="sdot" data-step="2"><div class="scirc">2</div><div class="slabel">Exams</div></div>
+    <div class="sline" id="l23"></div>
+    <div class="sdot" data-step="3"><div class="scirc">3</div><div class="slabel">Subjects</div></div>
+    <div class="sline" id="l34"></div>
+    <div class="sdot" data-step="4"><div class="scirc">4</div><div class="slabel">Routine</div></div>
+    <div class="sline" id="l45"></div>
+    <div class="sdot" data-step="5"><div class="scirc">5</div><div class="slabel">Generate</div></div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="card active" id="step1">
+    <h2 class="card-title">📅 Study Period & Unavailable Dates</h2>
+    <p class="card-desc">Set when you start studying and when your last exam is. Mark days or specific hours you cannot study.</p>
+    <div class="row2">
+      <div class="fg"><label>Study Start Date</label><input type="date" id="startDate"/></div>
+      <div class="fg"><label>Last Exam Date</label><input type="date" id="endDate"/></div>
+    </div>
+
+    <!-- Full unavailable DAYS -->
+    <div class="fg">
+      <label>🚫 Mark Full Unavailable Days</label>
+      <div style="display:flex;gap:9px;align-items:center;">
+        <input type="date" id="unavIn" style="flex:1;"/>
+        <button class="btn btn-gh" onclick="addUnavail()" style="white-space:nowrap;">+ Add Day</button>
+      </div>
+      <p class="hint">Entire day unavailable</p>
+      <div class="dtags" id="dtags"></div>
+    </div>
+
+    <!-- Partial unavailable HOURS -->
+    <div class="fg" style="margin-top:4px;">
+      <label>⏰ Mark Unavailable Hours on a Day <span style="color:var(--muted);font-weight:600;font-size:0.74rem;">(e.g. wedding 9AM–1PM)</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end;">
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:4px;">Date</div>
+          <input type="date" id="uhDate" style="width:100%;"/>
+        </div>
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:4px;">From</div>
+          <input type="time" id="uhFrom" value="09:00" style="width:100%;"/>
+        </div>
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:4px;">To</div>
+          <input type="time" id="uhTo" value="13:00" style="width:100%;"/>
+        </div>
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;color:var(--muted);margin-bottom:4px;">Reason</div>
+          <input type="text" id="uhReason" placeholder="e.g. Wedding" style="width:100%;"/>
+        </div>
+        <button class="btn btn-gh" onclick="addUnavailHours()" style="white-space:nowrap;height:42px;align-self:end;">+ Add</button>
+      </div>
+      <p class="hint"></p>
+      <div class="dtags" id="uhtags"></div>
+    </div>
+
+    <div class="nav-btns"><div></div><button class="btn btn-pr" onclick="go(2)">Next: Exam Timetable →</button></div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card" id="step2">
+    <h2 class="card-title">📋 Exam Timetable</h2>
+    <p class="card-desc">Paste your college exam schedule. The system will automatically detect dates and subjects.</p>
+    <div class="fg">
+      <label>Exam Timetable (paste as-is)</label>
+      <textarea id="examTT" placeholder="Example:&#10;Mathematics — 15/11/2024&#10;Physics — 18/11/2024&#10;Chemistry — 20/11/2024&#10;English — 22 November 2024&#10;&#10;Paste your timetable in any format..."></textarea>
+      <p class="hint">Supports: DD/MM/YYYY, DD-MM-YYYY, Month DD YYYY, etc.</p>
+    </div>
+    <div id="examPrev" style="display:none">
+      <p style="font-size:0.8rem;font-weight:800;color:var(--green);margin-bottom:8px;">✓ Detected Exams:</p>
+      <div class="upreview" id="examPrevList"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-gh" onclick="go(1)">← Back</button>
+      <button class="btn btn-pr" onclick="go(3)">Next: Add Subjects →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="card" id="step3">
+    <h2 class="card-title">📚 Subjects & Syllabus</h2>
+    <p class="card-desc">Add each subject you need to study. Paste the syllabus to auto-detect units and topics.</p>
+    <div class="slist" id="subjList"></div>
+    <div class="add-form">
+      <p class="add-form-title">+ Add New Subject</p>
+      <div class="row2">
+        <div class="fg" style="margin-bottom:0"><label>Subject Name</label><input type="text" id="newName" placeholder="e.g. Mathematics"/></div>
+        <div class="fg" style="margin-bottom:0"><label>Subject Color</label><div class="swatches" id="swatches"></div></div>
+      </div>
+      <div class="fg" style="margin-top:14px">
+        <label>Syllabus — Upload PDF <span style="color:var(--muted);font-weight:600;font-size:0.75rem;">or paste text below</span></label>
+
+        <!-- PDF Drop Zone -->
+        <div class="pdf-zone" id="pdfZone" onclick="document.getElementById('pdfInput').click()">
+          <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="handlePdfUpload(event)"/>
+          <div class="pdf-zone-icon">📄</div>
+          <div class="pdf-zone-text">Click to upload PDF syllabus</div>
+          <div class="pdf-zone-sub">Drag & drop or click · PDF files only</div>
+        </div>
+
+        <!-- PDF success state (hidden until uploaded) -->
+        <div id="pdfSuccess" style="display:none;">
+          <div class="pdf-success-card">
+            <div class="pdf-success-icon">✅</div>
+            <div class="pdf-success-info">
+              <div class="pdf-success-name" id="pdfFileName">syllabus.pdf</div>
+              <div class="pdf-success-meta" id="pdfMeta">Extracting...</div>
+            </div>
+            <button class="pdf-remove-btn" onclick="removePdf()">✕</button>
+          </div>
+          <div class="upreview" id="pdfUnitsPrev" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- Fallback: manual text -->
+        <div style="display:flex;align-items:center;gap:10px;margin:10px 0;">
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+          <span style="font-size:0.72rem;color:var(--muted);font-weight:700;">OR TYPE / PASTE MANUALLY</span>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>
+        <textarea id="newSyllabus" placeholder="Unit 1: Algebra&#10;1.1 Linear Equations&#10;1.2 Quadratic Equations&#10;&#10;Unit 2: Calculus..." style="min-height:90px;"></textarea>
+        <button class="btn btn-gh" onclick="prevSyllabus()" style="margin-top:7px;font-size:0.78rem;padding:7px 14px;">🔍 Preview Text Detection</button>
+        <div id="syllPrev" style="margin-top:8px;display:none;"></div>
+      </div>
+      <button class="btn btn-pr" onclick="addSubject()" style="width:100%;justify-content:center;">Add Subject</button>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-gh" onclick="go(2)">← Back</button>
+      <button class="btn btn-pr" onclick="go(4)">Next: Daily Routine →</button>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="card" id="step4">
+    <h2 class="card-title">⏰ Your Daily Routine</h2>
+    <p class="card-desc">Tell us about your typical day so we can calculate your exact free study time.</p>
+    <div class="row2">
+      <div class="fg"><label>Wake Up Time</label><input type="time" id="wakeTime" value="06:00"/></div>
+      <div class="fg"><label>College Start Time</label><input type="time" id="collStart" value="09:00"/></div>
+    </div>
+    <div class="row2">
+      <div class="fg"><label>College Hours / Day</label><input type="number" id="collHrs" value="6" min="0" max="12" step="0.5"/><p class="hint">Including lectures and labs</p></div>
+      <div class="fg"><label>Sleep Hours / Night</label><input type="number" id="sleepHrs" value="7" min="4" max="12" step="0.5"/></div>
+    </div>
+    <div class="row2">
+      <div class="fg"><label>Meal Time (hrs/day)</label><input type="number" id="mealHrs" value="1.5" min="0.5" max="4" step="0.5"/><p class="hint">Breakfast + lunch + dinner</p></div>
+      <div class="fg"><label>Other Commitments (hrs/day)</label><input type="number" id="otherHrs" value="1" min="0" max="6" step="0.5"/><p class="hint">Exercise, hobbies, family</p></div>
+    </div>
+    <div class="freebox">
+      <div class="freebox-label">📊 Estimated Free Study Time</div>
+      <div class="freebox-num" id="freeDisp">— hours/day</div>
+      <div class="freebox-sub">Available for study each day based on your routine</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-gh" onclick="go(3)">← Back</button>
+      <button class="btn btn-pr" onclick="go(5)">Next: Review & Generate →</button>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="card" id="step5">
+    <h2 class="card-title">🚀 Review & Generate</h2>
+    <p class="card-desc">Review your inputs and generate your personalized study schedule.</p>
+    <div id="reviewList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:26px;"></div>
+    <button class="btn btn-gr" onclick="generate()" style="width:100%;justify-content:center;font-size:0.97rem;padding:15px;">✨ Generate My Schedule</button>
+    <div class="nav-btns" style="border-top:none;padding-top:0;margin-top:14px;">
+      <button class="btn btn-gh" onclick="go(4)">← Edit Routine</button><div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS=['#2563eb','#7c3aed','#10b981','#f59e0b','#ef4444','#06b6d4','#8b5cf6','#f97316','#84cc16','#ec4899'];
+const S={step:1,unavail:[],unavailHours:[],subjects:[],color:COLORS[0]};
+
+function doLogout(){fetch('/api/auth/logout',{method:'POST'}).then(()=>window.location.href='/login');}
+
+window.onload=async()=>{
+  // Check MySQL session
+  try{
+    const r=await fetch('/api/auth/me');const d=await r.json();
+    if(d.logged_in){
+      document.getElementById('navUser').textContent='👤 '+d.name;
+      document.getElementById('logoutBtn').style.display='flex';
+
+      // ── If user already has a saved schedule → go straight to calendar ──
+      const sr=await fetch('/api/schedule/load');
+      const sd=await sr.json();
+      if(sd.found){
+        // Load into sessionStorage so calendar can use it
+        sessionStorage.setItem('studyflow_schedule', JSON.stringify(sd.schedule));
+        window.location.href='/calendar';
+        return;   // stop here — don't render planner
+      }
+    }
+  }catch(e){}
+  // No saved schedule — show the planner form normally
+  const t=new Date(), e=new Date(t);
+  e.setMonth(e.getMonth()+2);
+  document.getElementById('startDate').value=fmt(t);
+  document.getElementById('endDate').value=fmt(e);
+  buildSwatches();
+  ['collHrs','sleepHrs','mealHrs','otherHrs'].forEach(id=>document.getElementById(id).addEventListener('input',calcFree));
+  calcFree();
+  document.getElementById('examTT').addEventListener('blur',parseExams);
+};
+function fmt(d){return d.toISOString().split('T')[0];}
+function calcFree(){
+  const c=parseFloat(document.getElementById('collHrs').value)||6,
+    s=parseFloat(document.getElementById('sleepHrs').value)||7,
+    m=parseFloat(document.getElementById('mealHrs').value)||1.5,
+    o=parseFloat(document.getElementById('otherHrs').value)||1;
+  document.getElementById('freeDisp').textContent=Math.max(24-c-s-m-o,0).toFixed(1)+' hours/day';
+}
+
+function go(n){
+  document.getElementById('step'+S.step).classList.remove('active');
+  document.querySelectorAll('.sdot').forEach(d=>{
+    const s=parseInt(d.dataset.step);d.classList.remove('active');
+    if(s<n)d.classList.add('done');else d.classList.remove('done');
+  });
+  for(let i=1;i<5;i++){const l=document.getElementById('l'+i+(i+1));if(l)l.classList.toggle('done',i<n);}
+  document.querySelector('[data-step="'+n+'"]').classList.add('active');
+  S.step=n;
+  document.getElementById('step'+n).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===5)buildReview();
+}
+
+// Unavailable hours (partial day)
+function addUnavailHours(){
+  const date=document.getElementById('uhDate').value;
+  const from=document.getElementById('uhFrom').value;
+  const to=document.getElementById('uhTo').value;
+  const reason=document.getElementById('uhReason').value.trim()||'Personal';
+  if(!date||!from||!to){alert('Please select date, from and to time.');return;}
+  if(from>=to){alert('From time must be before To time.');return;}
+  S.unavailHours.push({date,from,to,reason});
+  renderUhTags();
+  document.getElementById('uhDate').value='';
+  document.getElementById('uhReason').value='';
+}
+function removeUnavailHours(i){S.unavailHours.splice(i,1);renderUhTags();}
+function renderUhTags(){
+  document.getElementById('uhtags').innerHTML=S.unavailHours.map((h,i)=>
+    `<div class="dtag" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.35);color:#92400e;">
+      ⏰ ${h.date} · ${h.from}–${h.to} · ${h.reason}
+      <button onclick="removeUnavailHours(${i})">×</button>
+    </div>`
+  ).join('');
+}
+
+// Full unavailable days
+function addUnavail(){
+  const v=document.getElementById('unavIn').value;
+  if(!v||S.unavail.includes(v))return;
+  S.unavail.push(v);renderTags();document.getElementById('unavIn').value='';
+}
+function removeUnavail(d){S.unavail=S.unavail.filter(x=>x!==d);renderTags();}
+function renderTags(){
+  document.getElementById('dtags').innerHTML=S.unavail.map(d=>
+    `<div class="dtag">${d}<button onclick="removeUnavail('${d}')">×</button></div>`).join('');
+}
+
+// Exams
+function parseExams(){
+  const text=document.getElementById('examTT').value;
+  if(!text.trim())return;
+  fetch('/api/generate_schedule',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({start_date:document.getElementById('startDate').value||'2024-01-01',
+      end_date:document.getElementById('endDate').value||'2024-12-31',
+      exam_timetable:text,unavailable_dates:[],subjects:[],routine:{}})
+  }).then(r=>r.json()).then(d=>{
+    const ex=d.exam_days||[];
+    if(!ex.length)return;
+    document.getElementById('examPrev').style.display='block';
+    document.getElementById('examPrevList').innerHTML=ex.map(e=>
+      `<div class="urow"><span class="ubadge">📝 Exam</span><span class="uname">${e.subject}</span><span class="ucount">${e.date}</span></div>`
+    ).join('');
+  }).catch(()=>{});
+}
+
+// Color swatches
+function buildSwatches(){
+  const c=document.getElementById('swatches');
+  COLORS.forEach(col=>{
+    const d=document.createElement('div');d.className='swatch'+(col===S.color?' sel':'');
+    d.style.background=col;d.onclick=()=>{S.color=col;document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('sel'));d.classList.add('sel');};
+    c.appendChild(d);
+  });
+}
+
+// ── PDF.js client-side extraction ───────────────────────────────
+// Uses Mozilla's pdf.js loaded from CDN — no server dependency needed
+const PDFJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let pdfjsLib = null;
+
+async function loadPdfJs() {
+  if (pdfjsLib) return pdfjsLib;
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = PDFJS_CDN;
+    script.onload = () => {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+      pdfjsLib = window.pdfjsLib;
+      resolve(pdfjsLib);
+    };
+    script.onerror = () => reject(new Error('Could not load pdf.js'));
+    document.head.appendChild(script);
+  });
+}
+
+// PDF Upload state
+let pdfExtractedText  = '';
+let pdfExtractedUnits = [];
+
+// Drag & drop support
+document.addEventListener('DOMContentLoaded', () => {
+  const zone = document.getElementById('pdfZone');
+  if (!zone) return;
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', ()  => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') processPdfFile(file);
+    else alert('Please drop a PDF file.');
+  });
+});
+
+async function handlePdfUpload(event) {
+  const file = event.target.files[0];
+  if (file) processPdfFile(file);
+}
+
+async function processPdfFile(file) {
+  // Show loading
+  document.getElementById('pdfZone').style.display    = 'none';
+  document.getElementById('pdfSuccess').style.display = 'block';
+  document.getElementById('pdfFileName').textContent  = file.name;
+  document.getElementById('pdfMeta').textContent      = 'Loading pdf.js...';
+  document.getElementById('pdfUnitsPrev').innerHTML   =
+    `<div class="pdf-loading"><div class="pdf-spin"></div><div class="pdf-loading-text">Reading PDF syllabus...</div></div>`;
+
+  try {
+    // 1. Load pdf.js from CDN
+    const lib = await loadPdfJs();
+    document.getElementById('pdfMeta').textContent = 'Extracting text...';
+
+    // 2. Read file as ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    // 3. Load PDF document
+    const pdfDoc   = await lib.getDocument({ data: arrayBuffer }).promise;
+    const numPages = pdfDoc.numPages;
+
+    // 4. Extract text from every page
+    let fullText = '';
+    for (let p = 1; p <= numPages; p++) {
+      const page    = await pdfDoc.getPage(p);
+      const content = await page.getTextContent();
+      const pageStr = content.items.map(item => item.str).join(' ');
+      fullText += pageStr + '\n';
+    }
+
+    if (!fullText.trim()) {
+      document.getElementById('pdfMeta').textContent = '⚠️ No text found. This may be a scanned image PDF — please paste the syllabus manually below.';
+      document.getElementById('pdfUnitsPrev').innerHTML = '';
+      return;
+    }
+
+    // 5. Send extracted text to Flask for unit parsing
+    const res  = await fetch('/api/parse_syllabus', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ text: fullText })
+    });
+    const data = await res.json();
+
+    pdfExtractedText  = fullText;
+    pdfExtractedUnits = data.units;
+
+    // 6. Update UI
+    document.getElementById('pdfMeta').textContent =
+      `${numPages} page(s) · ${fullText.trim().length.toLocaleString()} chars · ${data.units.length} unit(s) detected`;
+
+    document.getElementById('pdfUnitsPrev').innerHTML = data.units.length
+      ? data.units.map(u =>
+          `<div class="urow">
+            <span class="ubadge">Unit ${u.number}</span>
+            <span class="uname">${u.name}</span>
+            <span class="ucount">${u.topic_count} topics</span>
+          </div>`).join('')
+      : '<p style="font-size:0.78rem;color:var(--muted);font-weight:600;padding:4px 0;">Text extracted — no numbered units found. Full text will be used as syllabus.</p>';
+
+  } catch (err) {
+    document.getElementById('pdfMeta').textContent = '⚠️ Failed to read PDF: ' + err.message;
+    document.getElementById('pdfUnitsPrev').innerHTML = '';
+  }
+}
+
+function removePdf() {
+  pdfExtractedText  = '';
+  pdfExtractedUnits = [];
+  document.getElementById('pdfZone').style.display    = 'block';
+  document.getElementById('pdfSuccess').style.display = 'none';
+  document.getElementById('pdfInput').value = '';
+}
+
+// Syllabus preview (text fallback)
+async function prevSyllabus() {
+  const t = document.getElementById('newSyllabus').value;
+  if (!t.trim()) return;
+  const r = await fetch('/api/parse_syllabus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: t }) });
+  const d = await r.json();
+  const p = document.getElementById('syllPrev'); p.style.display = 'block';
+  if (!d.units.length) { p.innerHTML = '<p style="color:var(--muted);font-size:0.78rem;font-weight:600;">No units detected — topics treated as one block.</p>'; return; }
+  p.innerHTML = `<div class="upreview">${d.units.map(u => `<div class="urow"><span class="ubadge">U${u.number}</span><span class="uname">${u.name}</span><span class="ucount">${u.topic_count} topics</span></div>`).join('')}</div>`;
+}
+
+async function addSubject() {
+  const name = document.getElementById('newName').value.trim();
+  if (!name) { alert('Please enter a subject name.'); return; }
+
+  // Priority: PDF extracted text > manually typed text
+  let syllabusText = '';
+  let units        = [];
+
+  if (pdfExtractedText) {
+    syllabusText = pdfExtractedText;
+    units        = pdfExtractedUnits;
+  } else {
+    syllabusText = document.getElementById('newSyllabus').value;
+    if (syllabusText.trim()) {
+      const r = await fetch('/api/parse_syllabus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: syllabusText }) });
+      units = (await r.json()).units;
+    }
+  }
+
+  const tot = units.reduce((a, u) => a + u.topic_count, 0);
+  S.subjects.push({ name, color: S.color, syllabus: syllabusText, units, total_topics: Math.max(tot, 1) });
+
+  // Reset form
+  document.getElementById('newName').value           = '';
+  document.getElementById('newSyllabus').value       = '';
+  document.getElementById('syllPrev').style.display  = 'none';
+  removePdf();
+  renderSubjects();
+}
+function removeSubject(i){S.subjects.splice(i,1);renderSubjects();}
+function renderSubjects(){
+  document.getElementById('subjList').innerHTML=S.subjects.map((s,i)=>
+    `<div class="sitem"><div class="sdot2" style="background:${s.color}"></div>
+    <div class="sinfo"><div class="sname">${s.name}</div><div class="stopics">${s.units.length} unit(s) · ${s.total_topics} topic(s)</div></div>
+    <button class="srem" onclick="removeSubject(${i})">🗑️</button></div>`
+  ).join('');
+}
+
+function buildReview(){
+  const st=document.getElementById('startDate').value,en=document.getElementById('endDate').value;
+  const c=document.getElementById('collHrs').value,sl=document.getElementById('sleepHrs').value,
+    m=document.getElementById('mealHrs').value,o=document.getElementById('otherHrs').value;
+  const free=Math.max(24-parseFloat(c)-parseFloat(sl)-parseFloat(m)-parseFloat(o),0).toFixed(1);
+  const items=[
+    {icon:'📅',label:'Study Period',val:`${st} → ${en}`},
+    {icon:'🚫',label:'Unavailable Days',val:`${S.unavail.length} day(s) marked`},
+    {icon:'📋',label:'Exam Timetable',val:document.getElementById('examTT').value.trim()?'Provided':'Not provided'},
+    {icon:'📚',label:'Subjects',val:S.subjects.length+' subject(s): '+S.subjects.map(s=>s.name).join(', ')},
+    {icon:'⏰',label:'Free Study Time',val:`~${free} hours/day`},
+  ];
+  document.getElementById('reviewList').innerHTML=items.map(i=>
+    `<div class="ritem"><div class="ricon">${i.icon}</div><div><div class="rlabel">${i.label}</div><div class="rval">${i.val}</div></div></div>`
+  ).join('');
+}
+
+async function generate(){
+  if(!S.subjects.length){alert('Please add at least one subject.');return;}
+  const st=document.getElementById('startDate').value,en=document.getElementById('endDate').value;
+  if(!st||!en){alert('Please set study dates.');return;}
+  document.getElementById('lo').classList.add('show');
+  try{
+    const res=await fetch('/api/generate_schedule',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({start_date:st,end_date:en,
+        exam_timetable:document.getElementById('examTT').value,
+        unavailable_dates:S.unavail,
+        unavailable_hours:S.unavailHours,
+        subjects:S.subjects,
+        routine:{wake_time:document.getElementById('wakeTime').value,
+          college_start:document.getElementById('collStart').value,
+          sleep_hours:document.getElementById('sleepHrs').value,
+          college_hours:document.getElementById('collHrs').value,
+          meal_hours:document.getElementById('mealHrs').value,
+          other_hours:document.getElementById('otherHrs').value}})});
+    const data=await res.json();
+
+    // Save to sessionStorage for immediate use
+    sessionStorage.setItem('studyflow_schedule',JSON.stringify(data));
+
+    // Also save to MySQL if logged in
+    try{
+      await fetch('/api/schedule/save',{method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({schedule:data})});
+    }catch(e){/* not logged in — that's ok */}
+
+    window.location.href='/calendar';
+  }catch(e){document.getElementById('lo').classList.remove('show');alert('Error generating. Please try again.');}
+}
+</script>
+</body>
+</html>
